@@ -6,26 +6,37 @@
     <title>ILTES KIDZ Quiz</title>
     <style>
         :root {
-            --primary-bg: #FFEFBA;
             --button-color: #FF6B6B;
             --accent-color: #4ECDC4;
             --apple-red: #ff3b30;
             --font-main: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
         }
 
+        /* Animated Color Background */
         body {
             margin: 0; padding: 0;
             font-family: var(--font-main);
-            background: linear-gradient(135deg, #FFEFBA 0%, #FFFFFF 100%);
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab, #ffefba);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             display: flex; justify-content: center; align-items: center;
             height: 100vh; overflow: hidden; text-align: center;
         }
 
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
             width: 90%; max-width: 550px; padding: 30px;
-            background: white; border-radius: 40px;
+            background: rgba(255, 255, 255, 0.9); /* Slight transparency to see BG */
+            border-radius: 40px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             border: 8px solid var(--accent-color);
+            position: relative;
+            z-index: 1;
         }
 
         .page { display: none; }
@@ -41,7 +52,6 @@
             border: 3px solid #eee; font-family: inherit; font-size: 1rem;
             box-sizing: border-box; outline: none;
         }
-        input:focus { border-color: var(--accent-color); }
 
         /* Buttons */
         .btn {
@@ -55,30 +65,31 @@
         /* Apple Loading Animation */
         #loader {
             display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: white;
+            width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95);
             z-index: 100; flex-direction: column; justify-content: center; align-items: center;
         }
 
+        .apple-container { animation: appleJump 1s infinite alternate; }
         .apple {
-            width: 80px; height: 70px; background-color: var(--apple-red);
-            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-            position: relative; animation: pulse 1s infinite ease-in-out;
+            width: 100px; height: 90px; background-color: var(--apple-red);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
         }
-        .apple::after { /* The Leaf */
-            content: ''; position: absolute; top: -15px; left: 50%;
-            width: 20px; height: 25px; background: #4caf50;
+        .apple::after {
+            content: ''; position: absolute; top: -18px; left: 55%;
+            width: 25px; height: 30px; background: #4caf50;
             border-radius: 100% 0% 100% 0%; transform: rotate(-10deg);
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+
+        @keyframes appleJump {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-30px) scale(1.1); }
         }
 
         /* Quiz Styles */
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .option-btn {
-            background: #fdfdfd; border: 3px solid #f0f0f0;
+            background: white; border: 3px solid #f0f0f0;
             padding: 15px; border-radius: 20px; cursor: pointer;
             font-size: 1.1rem; font-family: inherit; transition: 0.2s;
         }
@@ -89,19 +100,21 @@
 
     <!-- Apple Loader -->
     <div id="loader">
-        <div class="apple"></div>
-        <h2 style="margin-top: 30px; color: var(--apple-red);">Loading...</h2>
+        <div class="apple-container">
+            <div class="apple"></div>
+        </div>
+        <h2 style="margin-top: 40px; color: var(--apple-red);">Picking apples...</h2>
     </div>
 
     <div class="container">
         <!-- Page 1: Welcome & Details -->
         <div id="page1" class="page active">
-            <h1 style="color: #FF6B6B; margin: 0;">ILTES KIDZ</h1>
+            <h1 style="color: #FF6B6B; margin: 0; font-size: 3rem;">ILTES KIDZ</h1>
             <h3 style="color: #6c5ce7; margin-top: 5px;">Mentor: MAZNA</h3>
             
             <form id="detailsForm" onsubmit="event.preventDefault(); startQuiz();">
                 <div class="input-group">
-                    <label>What is your name?</label>
+                    <label>Enter Your Name:</label>
                     <input type="text" id="userName" placeholder="Type name here..." required>
                 </div>
                 <div class="input-group">
@@ -114,16 +127,17 @@
 
         <!-- Page 2: Quiz -->
         <div id="page2" class="page">
-            <h4 id="question-count" style="color: #999;">Question 1 of 10</h4>
-            <p id="question-text" style="font-size: 1.4rem; font-weight: bold;"></p>
+            <h4 id="question-count" style="color: #888;">Question 1 of 10</h4>
+            <p id="question-text" style="font-size: 1.6rem; font-weight: bold; color: #333;"></p>
             <div id="options" class="options-grid"></div>
         </div>
 
         <!-- Page 3: Results -->
         <div id="page3" class="page">
-            <h1 style="color: #4ECDC4;">Well Done!</h1>
-            <p id="congrats-text"></p>
-            <h2 id="final-score" style="font-size: 3rem; color: #FF6B6B;">0/10</h2>
+            <div style="font-size: 4rem; animation: pulse 1s infinite;">🏆</div>
+            <h1 style="color: #4ECDC4;">Great Job!</h1>
+            <p id="congrats-text" style="font-size: 1.2rem;"></p>
+            <h2 id="final-score" style="font-size: 3.5rem; color: #FF6B6B; margin: 10px 0;">0/10</h2>
             <button class="btn" onclick="location.reload()">Try Again</button>
         </div>
     </div>
@@ -146,15 +160,13 @@
         let score = 0;
 
         function startQuiz() {
-            // Show Apple Animation
             document.getElementById('loader').style.display = 'flex';
-            
             setTimeout(() => {
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('page1').classList.remove('active');
                 document.getElementById('page2').classList.add('active');
                 loadQuestion();
-            }, 2000); // 2-second apple animation
+            }, 2500); 
         }
 
         function loadQuestion() {
@@ -183,7 +195,7 @@
             const name = document.getElementById('userName').value;
             document.getElementById('page2').classList.remove('active');
             document.getElementById('page3').classList.add('active');
-            document.getElementById('congrats-text').innerText = `Congratulations ${name}! You did a great job.`;
+            document.getElementById('congrats-text').innerText = `${name}, you finished the quiz!`;
             document.getElementById('final-score').innerText = `${score} / 10`;
         }
     </script>
